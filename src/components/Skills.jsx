@@ -1,107 +1,144 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { BookOpen, Brain, ClipboardList, Code, Globe, Handshake, Map, MessageSquare, Radio, Ruler, Satellite, Target } from 'lucide-react';
+import SectionHeading from './SectionHeading';
 
 const technicalSkills = [
-  { name: 'GIS & Geospatial Technology', pct: 85, icon: '🗺️', bg: 'rgba(0,212,255,0.12)' },
-  { name: 'AutoCAD & Technical Drawing', pct: 80, icon: '📐', bg: 'rgba(0,170,200,0.12)' },
-  { name: 'Field Surveying', pct: 90, icon: '📡', bg: 'rgba(0,150,180,0.12)' },
-  { name: 'Remote Sensing', pct: 70, icon: '🛰️', bg: 'rgba(0,130,160,0.12)' },
-  { name: 'Geomatics Engineering', pct: 85, icon: '🌐', bg: 'rgba(0,212,255,0.12)' },
-  { name: 'Programming & Digital Tools', pct: 65, icon: '💻', bg: 'rgba(0,190,220,0.12)' },
+  { name: 'GIS & Geospatial Technology', pct: 85, Icon: Map },
+  { name: 'AutoCAD & Technical Drawing', pct: 80, Icon: Ruler },
+  { name: 'Field Surveying', pct: 90, Icon: Radio },
+  { name: 'Remote Sensing', pct: 70, Icon: Satellite },
+  { name: 'Geomatics Engineering', pct: 85, Icon: Globe },
+  { name: 'Programming & Digital Tools', pct: 65, Icon: Code },
 ];
 
 const skillCategories = [
   {
-    icon: '🗺️',
+    Icon: Map,
     title: 'GIS & Geospatial',
-    tags: 'GIS • Geospatial Technology\nSurveying • Remote Sensing\nCartography',
+    tags: ['GIS • Geospatial Technology', 'Surveying • Remote Sensing', 'Cartography'],
   },
   {
-    icon: '📐',
+    Icon: Ruler,
     title: 'Engineering & Design',
-    tags: 'AutoCAD • Technical Drawing\nEngineering Applications\nGeomatics Tools',
+    tags: ['AutoCAD • Technical Drawing', 'Engineering Applications', 'Geomatics Tools'],
   },
   {
-    icon: '💻',
+    Icon: Code,
     title: 'Programming & Tech',
-    tags: 'Programming • Digital Tools\nData Management\nSoftware Applications',
+    tags: ['Programming • Digital Tools', 'Data Management', 'Software Applications'],
   },
 ];
 
 const softSkills = [
-  { icon: '🗣️', title: 'Communication', desc: 'Effective professional communication and coordination with colleagues and stakeholders.' },
-  { icon: '🎯', title: 'Leadership', desc: 'Taking responsibility and guiding tasks toward successful completion.' },
-  { icon: '🤝', title: 'Teamwork', desc: 'Collaborating with colleagues to accomplish professional objectives efficiently.' },
-  { icon: '🧠', title: 'Problem Solving', desc: 'Systematic approach to technical and practical challenges in surveying work.' },
-  { icon: '📋', title: 'Project Management', desc: 'Organizing tasks and coordinating activities for successful assignment completion.' },
-  { icon: '📚', title: 'Continuous Learning', desc: 'Strong drive for ongoing education and expanding technical knowledge.' },
+  {
+    Icon: MessageSquare,
+    title: 'Communication',
+    desc: 'Clear communication with colleagues, supervisors and stakeholders in field and office settings.',
+  },
+  { Icon: Target, title: 'Leadership', desc: 'Taking ownership of assigned tasks and seeing them through to completion.' },
+  { Icon: Handshake, title: 'Teamwork', desc: 'Working alongside survey teams on government assignments day to day.' },
+  {
+    Icon: Brain,
+    title: 'Problem Solving',
+    desc: 'Finding practical solutions to field challenges and technical issues as they arise.',
+  },
+  {
+    Icon: ClipboardList,
+    title: 'Project Management',
+    desc: 'Keeping assignments organized and on track within a government work environment.',
+  },
+  {
+    Icon: BookOpen,
+    title: 'Continuous Learning',
+    desc: "Currently studying for a Bachelor's while working full time, which says a lot about the drive to keep improving.",
+  },
 ];
 
 export default function Skills() {
-  const skillsRef = useRef(null);
+  const sectionRef = useRef(null);
+  const [revealed, setRevealed] = useState(false);
 
+  // Bars fill once when the section scrolls into view.
   useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const fills = entry.target.querySelectorAll('.skill-fill');
-            fills.forEach(fill => {
-              fill.style.width = fill.dataset.pct + '%';
-            });
-          }
-        });
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setRevealed(true);
+          observer.disconnect();
+        }
       },
       { threshold: 0.2 }
     );
-    if (skillsRef.current) observer.observe(skillsRef.current);
+
+    observer.observe(node);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section id="skills" ref={skillsRef}>
-      <div className="container">
-        <h2 className="section-title">My <span>Skills</span></h2>
-        <p className="section-subtitle">Technical expertise developed through field experience and academic study</p>
+    <section id="skills" ref={sectionRef} className="py-[90px] max-[600px]:py-[60px]">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <SectionHeading title="My" accent="Skills" subtitle="Built through 7+ years of hands-on surveying work" />
 
-        <div className="skills-grid">
-          {technicalSkills.map(skill => (
-            <div key={skill.name} className="skill-item">
-              <div className="skill-icon-wrap" style={{ background: skill.bg }}>
-                <span>{skill.icon}</span>
-              </div>
-              <div className="skill-info">
-                <div className="skill-header">
-                  <span className="skill-name">{skill.name}</span>
-                  <span className="skill-pct">{skill.pct}%</span>
+        <div className="grid gap-x-16 gap-y-7 grid-cols-2 max-[900px]:grid-cols-1">
+          {technicalSkills.map(({ name, pct, Icon }) => (
+            <div key={name} className="flex items-center gap-4">
+              <span className="flex size-[50px] shrink-0 items-center justify-center rounded-full bg-accent/10 text-[1.4rem]">
+                <Icon className="size-6" />
+              </span>
+              <div className="flex-1">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="font-display text-[0.93rem] font-semibold text-ink">{name}</span>
+                  <span className="text-[0.8rem] font-semibold text-accent">{pct}%</span>
                 </div>
-                <div className="skill-bar">
-                  <div className="skill-fill" data-pct={skill.pct}></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-hairline-soft">
+                  <div
+                    className="h-full rounded-full bg-linear-to-r from-accent to-accent-end transition-[width] duration-1000 ease-linear"
+                    style={{ width: revealed ? `${pct}%` : '0%' }}
+                  />
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Category Cards */}
-        <div className="skills-cats">
-          {skillCategories.map(cat => (
-            <div key={cat.title} className="skill-cat-card">
-              <div className="skill-cat-icon">{cat.icon}</div>
-              <div className="skill-cat-title">{cat.title}</div>
-              <div className="skill-cat-tags" style={{ whiteSpace: 'pre-line' }}>{cat.tags}</div>
+        <div className="mt-14 grid gap-5 grid-cols-3 max-[900px]:grid-cols-1">
+          {skillCategories.map(({ Icon, title, tags }) => (
+            <div
+              key={title}
+              className="rounded-[16px] border border-line bg-surface px-[22px] py-7 text-center transition hover:-translate-y-1 hover:border-line-strong hover:shadow-card"
+            >
+              <Icon className="mx-auto mb-3.5 size-9 text-accent" />
+              <h3 className="mb-2 font-display text-[0.98rem] font-bold text-accent">{title}</h3>
+              <p className="text-[0.82rem] leading-[1.8] text-faint">
+                {tags.map(line => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Soft Skills */}
-        <h2 className="section-title" style={{ marginTop: '80px' }}>Professional <span>Skills</span></h2>
-        <p className="section-subtitle">Personal competencies that complement technical expertise</p>
-        <div className="soft-skills-grid">
-          {softSkills.map(s => (
-            <div key={s.title} className="soft-card">
-              <div className="soft-icon">{s.icon}</div>
-              <div className="soft-title">{s.title}</div>
-              <div className="soft-desc">{s.desc}</div>
+        <SectionHeading
+          title="Professional"
+          accent="Skills"
+          subtitle="How I work with people, not just with instruments"
+          className="mt-20"
+        />
+
+        <div className="grid gap-5 grid-cols-3 max-[900px]:grid-cols-2 max-[600px]:grid-cols-1">
+          {softSkills.map(({ Icon, title, desc }) => (
+            <div
+              key={title}
+              className="relative overflow-hidden rounded-[16px] border border-line bg-surface px-[22px] py-7 text-center transition hover:-translate-y-1.5 hover:border-line-strong hover:shadow-accent after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-left after:scale-x-0 after:bg-accent after:transition-transform hover:after:scale-x-100"
+            >
+              <Icon className="mx-auto mb-3.5 size-9 text-accent" />
+              <h3 className="mb-2.5 font-display text-[1rem] font-bold">{title}</h3>
+              <p className="text-[0.83rem] leading-[1.7] text-faint">{desc}</p>
             </div>
           ))}
         </div>

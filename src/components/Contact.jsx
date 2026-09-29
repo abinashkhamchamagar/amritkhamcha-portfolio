@@ -1,121 +1,287 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Building, Check, CircleAlert, LoaderCircle, Mail, MapPin, Phone } from 'lucide-react';
+import SectionHeading from './SectionHeading';
+import SocialLinks from './SocialLinks';
+import { CONTACT_API, PROFILE } from '../config';
+
+const emptyForm = { firstName: '', lastName: '', phone: '', subject: '', email: '', message: '', website: '' };
+
+const field =
+  'w-full rounded-[10px] border border-line bg-surface px-4 py-[13px] text-[0.9rem] text-ink outline-none transition placeholder:text-faint focus:border-accent-ink focus:shadow-[0_0_0_3px_rgb(249_247_241/0.1)]';
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const contactItems = [
+  { Icon: Phone, value: PROFILE.phone, href: PROFILE.phoneHref },
+  { Icon: Mail, value: PROFILE.email, href: `mailto:${PROFILE.email}` },
+  { Icon: MapPin, value: PROFILE.city },
+  { Icon: Building, value: PROFILE.organization },
+];
 
 export default function Contact() {
-  const [form, setForm] = useState({ firstName: '', lastName: '', phone: '', subject: '', email: '', message: '' });
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState('');
 
-  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  useEffect(() => {
+    if (status !== 'sent') return;
+    const timer = setTimeout(() => {
+      setStatus('idle');
+      setError('');
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [status]);
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
-    setForm({ firstName: '', lastName: '', phone: '', subject: '', email: '', message: '' });
+  const update = event => {
+    const { name, value } = event.target;
+    setForm(current => ({ ...current, [name]: value }));
+    if (status === 'error') {
+      setStatus('idle');
+      setError('');
+    }
+  };
+
+  const validate = () => {
+    const firstName = form.firstName.trim();
+    const lastName = form.lastName.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+
+    if (!firstName || !lastName) return 'Please enter your first and last name.';
+    if (!emailPattern.test(email)) return 'Please enter a valid email address.';
+    if (message.length < 10) return 'Please write a slightly longer message (at least 10 characters).';
+    return null;
+  };
+
+  const handleSubmit = async event => {
+    event.preventDefault();
+    if (status === 'sending') return;
+
+    const invalid = validate();
+    if (invalid) {
+      setError(invalid);
+      setStatus('error');
+      return;
+    }
+
+    // Honeypot: real people never fill a hidden field, so silently drop bots.
+    if (form.website.trim() !== '') return;
+
+    setStatus('sending');
+    setError('');
+
+    try {
+      const response = await fetch(CONTACT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.error ?? 'Could not send your message. Please try again.');
+      }
+
+      setForm(emptyForm);
+      setStatus('sent');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send your message. Please try again.');
+      setStatus('error');
+    }
   };
 
   return (
-    <section className="section-alt" id="contact">
-      <div className="container">
-        <h2 className="section-title">Contact <span>Me</span></h2>
-        <p className="section-subtitle">Open to connecting with professionals in Geomatics, GIS, and Engineering</p>
+    <section id="contact" className="bg-bg-alt py-[90px] max-[600px]:py-[60px]">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <SectionHeading title="Contact" accent="Me" subtitle="Feel free to reach out, I'm open to connecting" />
 
-        <div className="contact-layout">
-          {/* Info Side */}
-          <div className="contact-info-side">
+        <div className="grid gap-12 grid-cols-[1fr_1.4fr] max-[900px]:grid-cols-1">
+          <div className="flex flex-col gap-[18px]">
             <div>
-              <div className="contact-logo">AK<span>.</span></div>
-              <div className="contact-tagline">
-                I am a Geomatics Surveyor and GIS professional working under the Survey Department,
-                Government of Nepal. I am open to connecting with professionals interested in
-                Geomatics Engineering, Surveying, GIS, and related fields.
+              <p className="mb-1 font-display text-[1.6rem] font-extrabold">
+                AK<span className="text-accent">.</span>
+              </p>
+              <p className="text-[0.88rem] leading-[1.7] text-muted">
+                I work as a Surveyor under the Survey Department, Government of Nepal. I&rsquo;m happy to connect
+                with anyone interested in geomatics, surveying, GIS, or just want to say hello.
+              </p>
+            </div>
+
+            <ul className="flex flex-col gap-[18px]">
+              {contactItems.map(({ Icon, value, href }) => {
+                const body = (
+                  <>
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-line bg-accent/10 text-accent">
+                      <Icon className="size-4" />
+                    </span>
+                    <span>{value}</span>
+                  </>
+                );
+
+                return (
+                  <li key={value} className="text-[0.88rem] text-muted">
+                    {href ? (
+                      <a href={href} className="flex items-center gap-3.5 transition-colors hover:text-ink">
+                        {body}
+                      </a>
+                    ) : (
+                      <span className="flex items-center gap-3.5">{body}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+
+            <SocialLinks />
+          </div>
+
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3.5">
+            <div className="grid grid-cols-2 gap-3.5 max-[600px]:grid-cols-1">
+              <div>
+                <label htmlFor="firstName" className="sr-only">
+                  First Name
+                </label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  className={field}
+                  placeholder="First Name"
+                  value={form.firstName}
+                  onChange={update}
+                  required
+                  maxLength={60}
+                />
+              </div>
+              <div>
+                <label htmlFor="lastName" className="sr-only">
+                  Last Name
+                </label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  className={field}
+                  placeholder="Last Name"
+                  value={form.lastName}
+                  onChange={update}
+                  required
+                  maxLength={60}
+                />
               </div>
             </div>
 
-            <div className="contact-item">
-              <div className="contact-item-icon">📞</div>
-              <span>9844774732</span>
-            </div>
-            <div className="contact-item">
-              <div className="contact-item-icon">✉️</div>
-              <span>amritkhamcha@gmail.com</span>
-            </div>
-            <div className="contact-item">
-              <div className="contact-item-icon">📍</div>
-              <span>Dhulikhel, Nepal</span>
-            </div>
-            <div className="contact-item">
-              <div className="contact-item-icon">🏛️</div>
-              <span>Survey Department, Government of Nepal</span>
+            <div className="grid grid-cols-2 gap-3.5 max-[600px]:grid-cols-1">
+              <div>
+                <label htmlFor="phone" className="sr-only">
+                  Phone
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  className={field}
+                  placeholder="Phone (optional)"
+                  value={form.phone}
+                  onChange={update}
+                  maxLength={30}
+                />
+              </div>
+              <div>
+                <label htmlFor="subject" className="sr-only">
+                  Subject
+                </label>
+                <input
+                  id="subject"
+                  name="subject"
+                  className={field}
+                  placeholder="Subject (optional)"
+                  value={form.subject}
+                  onChange={update}
+                  maxLength={120}
+                />
+              </div>
             </div>
 
-            <div className="contact-socials">
-              <a href="tel:+9779844774732" className="contact-social" title="Call: 9844774732">📞</a>
-              <a href="mailto:amritkhamcha@gmail.com" className="contact-social" title="Email: amritkhamcha@gmail.com">✉</a>
-              <a href="https://www.facebook.com/AmritKhamcha" target="_blank" rel="noopener noreferrer" className="contact-social" title="Facebook" style={{fontWeight:700}}>f</a>
-              <a href="https://www.instagram.com/ajax_ak/" target="_blank" rel="noopener noreferrer" className="contact-social" title="Instagram">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className={field}
+                placeholder="Email"
+                value={form.email}
+                onChange={update}
+                required
+                maxLength={120}
+              />
             </div>
-          </div>
 
-          {/* Form Side */}
-          <form className="contact-form" onSubmit={handleSubmit}>
-            <div className="form-row">
-              <input
-                className="form-input"
-                name="firstName"
-                placeholder="First Name"
-                value={form.firstName}
-                onChange={handleChange}
+            <div>
+              <label htmlFor="message" className="sr-only">
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                className={`${field} min-h-[130px] resize-y`}
+                placeholder="Message"
+                value={form.message}
+                onChange={update}
                 required
-              />
-              <input
-                className="form-input"
-                name="lastName"
-                placeholder="Last Name"
-                value={form.lastName}
-                onChange={handleChange}
-                required
+                minLength={10}
+                maxLength={2000}
               />
             </div>
-            <div className="form-row">
+
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="website">Website</label>
               <input
-                className="form-input"
-                name="phone"
-                placeholder="Phone"
-                value={form.phone}
-                onChange={handleChange}
-              />
-              <input
-                className="form-input"
-                name="subject"
-                placeholder="Subject"
-                value={form.subject}
-                onChange={handleChange}
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.website}
+                onChange={update}
               />
             </div>
-            <input
-              className="form-input"
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-            <textarea
-              className="form-textarea"
-              name="message"
-              placeholder="Message"
-              value={form.message}
-              onChange={handleChange}
-              required
-            />
-            <button type="submit" className="btn btn-primary form-submit">
-              {sent ? '✓ Message Sent!' : 'Submit'}
+
+            <button
+              type="submit"
+              disabled={status === 'sending'}
+              className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {status === 'sending' && <LoaderCircle className="size-4 animate-spin" />}
+              {status === 'sent' && <Check className="size-4" />}
+              {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Message Sent!' : 'Submit'}
             </button>
+
+            <p aria-live="polite" className="text-[0.8rem]">
+              {status === 'error' && (
+                <span className="flex items-center gap-2 text-accent">
+                  <CircleAlert className="size-4 shrink-0" />
+                  {error}
+                </span>
+              )}
+              {status === 'sent' && (
+                <span className="flex items-center gap-2 text-muted">
+                  <Check className="size-4 shrink-0" />
+                  Thanks for reaching out &mdash; I&rsquo;ll reply to the address you gave.
+                </span>
+              )}
+              {status === 'idle' && (
+                <span className="text-faint">
+                  Or email me directly at{' '}
+                  <a href={`mailto:${PROFILE.email}`} className="text-muted underline underline-offset-2">
+                    {PROFILE.email}
+                  </a>
+                  .
+                </span>
+              )}
+            </p>
           </form>
         </div>
       </div>

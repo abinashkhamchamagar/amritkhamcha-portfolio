@@ -1,45 +1,52 @@
+import SectionHeading from './SectionHeading';
+
 const stats = [
-  { num: '7+', label: 'Years of Professional Experience' },
+  { num: '7+', label: 'Years of Experience' },
   { num: 'L5', label: 'Government Service Level' },
-  { num: '2019', label: 'Career Start Year' },
+  { num: '2019', label: 'Started Service' },
   { num: 'KU', label: 'Current University' },
 ];
 
 const listItems = [
-  '7+ years of professional experience in Nepal Government surveying service',
-  'Non-Gazetted First Class Surveyor — Level 5',
-  'Working under the Survey Department, Government of Nepal',
-  'Diploma in Geomatics Engineering from LMTC, Dulikhel',
-  'Currently pursuing Bachelor\'s in Geomatics Engineering at KU',
-  'Practical field experience alongside continued academic development',
-  'Strong expertise in GIS, Surveying, and Geospatial Technologies',
-  'Passion for Engineering, Programming, and emerging technologies',
+  '7+ years in government surveying service under the Survey Department',
+  'Non-Gazetted First Class Surveyor, Level 5',
+  'Diploma in Geomatics Engineering from LMTC, Dulikhel (2018)',
+  "Currently pursuing Bachelor's in Geomatics Engineering at Kathmandu University",
+  'Hands-on experience in field surveying, GIS, and technical mapping',
+  'Working and studying at the same time since 2025',
+  'Interested in GIS, Remote Sensing, Programming and new technologies',
+  'Based in Dhulikhel, Nepal',
 ];
 
 export default function Highlights() {
   return (
-    <section id="highlights">
-      <div className="container">
-        <h2 className="section-title">Academic & Professional <span>Highlights</span></h2>
-        <p className="section-subtitle">Key milestones in my professional journey</p>
+    <section id="highlights" className="py-[90px] max-[600px]:py-[60px]">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <SectionHeading title="Quick" accent="Profile" subtitle="The short version of my professional story" />
 
-        <div className="highlights-grid">
-          {stats.map(s => (
-            <div key={s.num} className="highlight-card">
-              <div className="highlight-num">{s.num}</div>
-              <div className="highlight-label">{s.label}</div>
+        <div className="mb-10 grid gap-5 grid-cols-4 max-[900px]:grid-cols-2 max-[600px]:grid-cols-1">
+          {stats.map(({ num, label }) => (
+            <div
+              key={label}
+              className="rounded-[16px] border border-line bg-surface px-5 py-6 text-center transition hover:-translate-y-1 hover:border-line-strong"
+            >
+              <p className="mb-2 font-display text-[2.2rem] font-extrabold text-accent">{num}</p>
+              <p className="text-[0.8rem] leading-[1.5] text-faint">{label}</p>
             </div>
           ))}
         </div>
 
-        <div className="highlights-list">
+        <ul className="grid gap-3.5 rounded-[16px] border border-line bg-surface p-8 grid-cols-2 max-[900px]:grid-cols-1">
           {listItems.map(item => (
-            <div key={item} className="highlight-list-item">
-              <div className="highlight-dot"></div>
+            <li key={item} className="flex items-center gap-3 text-[0.88rem] text-muted">
+              <span
+                className="size-2 shrink-0 rounded-full bg-accent shadow-[0_0_8px_rgb(212_167_44/0.5)]"
+                aria-hidden="true"
+              />
               <span>{item}</span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

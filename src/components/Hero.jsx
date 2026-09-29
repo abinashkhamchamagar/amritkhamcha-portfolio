@@ -1,63 +1,113 @@
-import heroImg from '../assets/hero.jpg';
+import { MapPin } from "lucide-react";
+import SocialLinks from "./SocialLinks";
+import heroImg from "../assets/hero.jpg";
+import { PROFILE } from "../config";
+
+const stats = [
+  { num: "7+", label: "Years Exp." },
+  { num: "L5", label: "Gov. Level" },
+  { num: "GIS", label: "Specialist" },
+];
+
+const DESKTOP = "min-[901px]:";
 
 export default function Hero() {
   return (
-    <section className="hero" id="home">
-      <div className="hero-bg"></div>
-      <div className="hero-mountains"></div>
-      <div className="hero-container">
-        <div className="hero-content">
-          <div className="hero-greeting">Hello, I'm</div>
-          <h1 className="hero-name">Amrit Khamcha</h1>
-          <p className="hero-role">
-            And I'm a <span>Geomatics Surveyor</span>
-          </p>
-          <p className="hero-org">📍 Survey Department, Government of Nepal &nbsp;|&nbsp; Dhulikhel, Nepal</p>
-          <p className="hero-desc">
-            Non-Gazetted First Class Surveyor (Level 5) with 7+ years of professional experience
-            in surveying, GIS & geospatial technologies. Currently pursuing a Bachelor's in
-            Geomatics Engineering at Kathmandu University.
+    <section
+      id="home"
+      className="relative flex min-h-screen items-center overflow-hidden pb-[90px] pt-[68px] max-[600px]:pb-[60px]"
+    >
+      <div
+        className="hero-veil pointer-events-none absolute inset-0"
+        aria-hidden="true"
+      />
+      <div
+        className="horizon-fade pointer-events-none absolute inset-x-0 bottom-0 h-[200px]"
+        aria-hidden="true"
+      />
+
+      <div
+        className={`relative z-10 mx-auto flex w-full max-w-[1400px] flex-col-reverse items-center gap-[34px] px-6 text-center ${DESKTOP}flex-row ${DESKTOP}justify-center ${DESKTOP}gap-12`}
+      >
+        <div
+          className={`w-full ${DESKTOP}basis-0 ${DESKTOP}flex-1 ${DESKTOP}max-w-[640px]`}
+        >
+          <p className="mb-3 flex items-center justify-center gap-3 text-[0.9rem] font-semibold uppercase tracking-[3px] text-accent before:h-0.5 before:w-9 before:bg-accent before:content-['']">
+            Hello, I&rsquo;m
           </p>
 
-          <div className="hero-socials">
-            <a href="mailto:amritkhamcha@gmail.com" className="hero-social-icon" title="Email">✉</a>
-            <a href="tel:+9779844774732" className="hero-social-icon" title="Phone">📞</a>
-            <a href="https://www.facebook.com/AmritKhamcha" target="_blank" rel="noopener noreferrer" className="hero-social-icon" title="Facebook" id="hero-fb-link" style={{fontWeight:700,fontSize:'1rem'}}>f</a>
-            <a href="https://www.instagram.com/ajax_ak/" target="_blank" rel="noopener noreferrer" className="hero-social-icon" title="Instagram" id="hero-ig-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
+          <h1 className="mb-2.5 text-[clamp(2.4rem,5vw,3.5rem)] font-extrabold leading-[1.1] text-ink">
+            {PROFILE.name}
+          </h1>
+
+          <p className="mb-2 text-[1.25rem] font-medium text-muted">
+            And I&rsquo;m a{" "}
+            <span className="font-semibold text-accent">
+              Geomatics Engineer / Land Surveyor
+            </span>
+          </p>
+
+          <p className="mb-6 flex items-center justify-center gap-1.5 text-[0.88rem] text-faint">
+            <MapPin className="size-3.5 shrink-0" />
+            <span>
+              {PROFILE.organization} | {PROFILE.city}
+            </span>
+          </p>
+
+          <p className="mx-auto mb-8 max-w-[480px] text-[0.96rem] leading-[1.8] text-muted">
+            Non-Gazetted First Class Surveyor (Level 5) with 7+ years of
+            experience in field surveying, GIS and geospatial work. Currently
+            pursuing a Bachelor&rsquo;s in Geomatics Engineering at Kathmandu
+            University.
+          </p>
+
+          <div className="mb-8 flex justify-center">
+            <SocialLinks />
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3.5">
+            <a href="#contact" className="btn btn-primary">
+              Contact Me
+            </a>
+            <a href="#about" className="btn btn-outline">
+              Know More
             </a>
           </div>
 
-          <div className="hero-actions">
-            <a href="#contact" className="btn btn-primary">📄 Download CV</a>
-            <a href="#about" className="btn btn-outline">View Portfolio</a>
-          </div>
-
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <div className="hero-stat-num">7+</div>
-              <div className="hero-stat-label">Years Exp.</div>
-            </div>
-            <div className="hero-stat" style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '24px' }}>
-              <div className="hero-stat-num">L5</div>
-              <div className="hero-stat-label">Gov. Level</div>
-            </div>
-            <div className="hero-stat" style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '24px' }}>
-              <div className="hero-stat-num">GIS</div>
-              <div className="hero-stat-label">Specialist</div>
-            </div>
-          </div>
+          <dl className="mt-9 flex justify-center gap-6">
+            {stats.map(({ num, label }, index) => (
+              <div
+                key={label}
+                className={`text-center ${index > 0 ? "border-l border-white/10 pl-6" : ""}`}
+              >
+                <dd className="font-display text-[1.8rem] font-extrabold leading-none text-accent">
+                  {num}
+                </dd>
+                <dt className="mt-1 text-[0.75rem] uppercase tracking-[1px] text-faint">
+                  {label}
+                </dt>
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <div className="hero-image-wrap">
-          <div className="hero-hex-wrap">
-            <div className="hero-hex-glow"></div>
+        <div
+          className={`relative w-full ${DESKTOP}basis-0 ${DESKTOP}flex-1 ${DESKTOP}max-w-[640px]`}
+        >
+          <div
+            className={`flex h-[354px] w-full items-center justify-center ${DESKTOP}h-[800px]`}
+          >
+            <div
+              className="animate-breathe absolute -inset-5 rounded-full bg-[radial-gradient(ellipse,rgb(212_167_44/0.2)_0%,transparent_65%)]"
+              aria-hidden="true"
+            />
+
             <img
               src={heroImg}
-              alt="Amrit Khamcha — Surveyor"
-              className="hero-img"
+              alt={PROFILE.name}
+              width="640"
+              height="800"
+              className={`animate-float h-[320px] w-[320px] ronded-full object-cover drop-shadow-[0_0_28px_rgb(212_167_44/0.5)] ${DESKTOP}h-[520px] ${DESKTOP}w-[520px]`}
             />
           </div>
         </div>
